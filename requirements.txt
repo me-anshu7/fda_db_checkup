@@ -3,9 +3,15 @@ httpx[http2]
 
 # Configuration management
 python-dotenv
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
 
 # General purpose retrying library
 tenacity
 
 # PostgreSQL database adapter
 psycopg2
+
+# Web framework for building APIs
+fastapi[standard]
+uvicorn[standard]
