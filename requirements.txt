@@ -1,0 +1,11 @@
+# Async HTTP and concurrency
+httpx[http2]
+
+# Configuration management
+python-dotenv
+
+# General purpose retrying library
+tenacity
+
+# PostgreSQL database adapter
+psycopg2
