@@ -221,8 +221,9 @@ def extract_specific_fields(record: dict) -> dict:
 
 def extract_event_text(mdr_text_list: list) -> str:
     """
-    Extract and combine event description and manufacturer narrative.
-    Handles duplicate descriptions by using only unique text.
+    Extract and combine event description and manufacturer narrative from MDR text entries.
+    Ensures only the first unique 'Description of Event or Problem' is included,
+    while all 'Additional Manufacturer Narrative' entries are concatenated.
 
     Args:
         mdr_text_list: List of MDR text entries
@@ -231,32 +232,34 @@ def extract_event_text(mdr_text_list: list) -> str:
         Combined event text string
     """
     event_description = ""
-    manufacturer_narrative = ""
+    manufacturer_narratives = []  # List to collect all narratives
+    seen_descriptions = set()  # Set to track unique descriptions
 
-    # Track seen descriptions to avoid duplicates
-    seen_descriptions = set()
-
+    # Process each text entry
     for text_entry in mdr_text_list:
         text_type = text_entry.get("text_type_code", "")
         text_content = text_entry.get("text", "").strip()
 
         if text_type == "Description of Event or Problem" and text_content:
-            # Only add if we haven't seen this exact description before
+            # Add only if not seen before
             if text_content not in seen_descriptions:
                 event_description = text_content
                 seen_descriptions.add(text_content)
         elif text_type == "Additional Manufacturer Narrative" and text_content:
-            manufacturer_narrative = text_content
+            # Collect all narratives
+            manufacturer_narratives.append(text_content)
 
-    # Combine the texts
+    # Build the combined text
     combined_text = ""
     if event_description:
         combined_text += f"Event Description: {event_description}"
-    if manufacturer_narrative:
+    if manufacturer_narratives:
+        # Join all narratives with a space
+        narrative_text = " ".join(manufacturer_narratives)
         if combined_text:
-            combined_text += f" Manufacturer Narrative: {manufacturer_narrative}"
+            combined_text += f" Manufacturer Narrative: {narrative_text}"
         else:
-            combined_text = f"Manufacturer Narrative: {manufacturer_narrative}"
+            combined_text = f"Manufacturer Narrative: {narrative_text}"
 
     return combined_text
 
